@@ -1,6 +1,9 @@
 $(document).ready(function () {
   let checkedAmenities = {};
-  $(document).on('change', "input[type='checkbox']", function () {
+  let checkedStates = {};
+  let checkedCities = {};
+  let checkedLocations = {};
+  $(document).on('change', ".amenities > .popover > li > input[type='checkbox']", function () {
     if (this.checked) {
       checkedAmenities[$(this).data('id')] = $(this).data('name');
     } else {
@@ -11,6 +14,36 @@ $(document).ready(function () {
       $('div.amenities > h4').text(Object.values(checkedAmenities).join(', '));
     } else {
       $('div.amenities > h4').html('&nbsp;');
+    }
+  });
+  $(document).on('change', ".locations > .popover > li > input[type='checkbox']", function () {
+    if (this.checked) {
+      checkedStates[$(this).data('id')] = $(this).data('name');
+      checkedLocations[$(this).data('id')] = $(this).data('name');
+    } else {
+      delete checkedStates[$(this).data('id')];
+      delete checkedLocations[$(this).data('id')];
+    }
+    let lst = Object.values(checkedLocations);
+    if (lst.length > 0) {
+      $('div.locations > h4').text(lst.join(', '));
+    } else {
+      $('div.locations > h4').html('&nbsp;');
+    }
+  });
+  $(document).on('change', ".locations > .popover > li > ul > li > input[type='checkbox']", function () {
+    if (this.checked) {
+      checkedCities[$(this).data('id')] = $(this).data('name');
+      checkedLocations[$(this).data('id')] = $(this).data('name');
+    } else {
+      delete checkedCities[$(this).data('id')];
+      delete checkedLocations[$(this).data('id')];
+    }
+    let lst = Object.values(checkedLocations);
+    if (lst.length > 0) {
+      $('div.locations > h4').text(lst.join(', '));
+    } else {
+      $('div.locations > h4').html('&nbsp;');
     }
   });
   $.get('http://0.0.0.0:5001/api/v1/status/', function (data, textStatus) {
@@ -40,7 +73,7 @@ $(document).ready(function () {
     $.ajax({
       type: 'POST',
       url: 'http://0.0.0.0:5001/api/v1/places_search',
-      data: JSON.stringify({'amenities': Object.keys(checkedAmenities)}),
+      data: JSON.stringify({'amenities': Object.keys(checkedAmenities), 'states': Object.keys(checkedStates), 'cities': Object.keys(checkedCities)}),
       dataType: 'json',
       contentType: 'application/json',
       success: function (data) {
